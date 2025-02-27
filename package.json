@@ -1,5 +1,5 @@
 {
-  "name": "slot",
+  "name": "slot-vcs",
   "version": "1.0.0",
   "description": "Version control system",
   "main": "index.js",
