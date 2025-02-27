@@ -11,7 +11,7 @@ let ourRepoName;
 // Helper function to check if the user is logged in (checks the .slot/config.json)
 async function isLoggedIn() {
     try {
-        const configPath = path.join(__dirname, "..", ".slot", "config.json");
+        const configPath = path.join(process.cwd(),".slot", "config.json");
         const config = await fs.readFile(configPath, "utf8");
         const userConfig = JSON.parse(config);
 
@@ -54,8 +54,8 @@ async function isLoggedIn() {
 async function validateRepositoryAccess() {
     try {
         // Adjust path to .slot folder
-        const configPath = path.join(__dirname, "..", ".slot", "config.json");
-        const remotePath = path.join(__dirname, "..", ".slot", "remote.json");
+        const configPath = path.join(process.cwd(),".slot", "config.json");
+        const remotePath = path.join(process.cwd(),".slot", "remote.json");
      
 
         // Read the config file (which contains the username)

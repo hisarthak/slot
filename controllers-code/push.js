@@ -17,7 +17,7 @@ const axios = require("axios");
 // Helper function to check if the user is logged in (checks the .slot/config.json)
 async function isLoggedIn() {
     try {
-        const configPath = path.join(__dirname, "..", ".slot", "config.json");
+        const configPath = path.join(process.cwd(), ".slot", "config.json");
         const config = await fs.readFile(configPath, "utf8");
         const userConfig = JSON.parse(config);
 
@@ -60,8 +60,8 @@ async function isLoggedIn() {
 async function validateRepositoryAccess() {
     try {
         // Adjust path to .slot folder
-        const configPath = path.join(__dirname, "..", ".slot", "config.json");
-        const remotePath = path.join(__dirname, "..", ".slot", "remote.json");
+        const configPath = path.join(process.cwd(),".slot", "config.json");
+        const remotePath = path.join(process.cwd(),".slot", "remote.json");
      
 
         // Read the config file (which contains the username)
@@ -247,30 +247,13 @@ let result;
                 }
             }
         }
-
-      
-           
-         
-        console.log(result.success);
-            console.log(result.pushNumber);
-          
-
-
         
         console.log("Saving changes...");
          // Read user config file
-         const configPath = path.join(__dirname, "..", ".slot", "config.json");
+         const configPath = path.join(process.cwd(),".slot", "config.json");
          const configData = await fs.readFile(configPath, "utf8");
          const userConfig = JSON.parse(configData);
          
-         
-         // Update values
-        
-      
-
-         
-        
-      
          logs.forEach(commit => {
             if (commit.push) commit.push = false;
         });

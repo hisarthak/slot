@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Adjust path to .slot folder
-const MYGIT_FOLDER = path.join(__dirname, '..', '.slot'); // .slot folder is outside the current folder
+const MYGIT_FOLDER = path.join(process.cwd(), '.slot'); // .slot folder is outside the current folder
 const REMOTE_FILE = path.join(MYGIT_FOLDER, 'remote.json'); // JSON file inside .slot
 
 // Ensure .slot folder exists
