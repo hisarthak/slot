@@ -1,8 +1,8 @@
-# Slot- Version Control System
+# Slot-Version Control System
 <img src="public/slot-logo.png" alt="slot-logo" width="95" height="95"/>
 
 ## Overview
-Slot-VCS (referred to as Slot) is a lightweight version control system designed for simplicity and efficiency. It allows users to track file changes, commit updates, and collaborate using remote repositories hosted on [CodeSlot](https://codeslot.in).
+Slot-VCS (referred to as Slot) s an NPM package that provides a version control system designed for simplicity and efficiency. It allows users to track file changes, commit updates, and collaborate using remote repositories hosted on [CodeSlot](https://codeslot.in).
 
 ## Compatibility
 
@@ -43,30 +43,35 @@ Stages a specific file for commit.
 slot add .
 ```
 Stages all modified and new files.
+<img src="public/addDemo.png" alt="slot-logo"/>
 
 ### Commit Changes
 ```sh
 slot commit -m "Your commit message"
 ```
 Commits the staged files with a message.
+<img src="public/commitDemo.png" alt="slot-logo"/>
 
 ### Push Commits
 ```sh
 slot push
 ```
 Pushes committed changes to the remote repository on CodeSlot.
+<img src="public/pushDemo.png" alt="slot-logo"/>
 
 ### Pull Changes
 ```sh
 slot pull
 ```
 Pulls the latest changes from the remote repository on CodeSlot.
+<img src="public/pullDemo.png" alt="slot-logo"/>
 
 ### Clone Repository
 ```sh
 slot clone <url>
 ```
 Clones a repository from the specified URL.
+<img src="public/cloneDemo.png" alt="slot-logo"/>
 
 ### View Commit History
 ```sh
