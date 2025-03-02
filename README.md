@@ -1,10 +1,16 @@
 # Slot-VCS - A Lightweight Version Control System
-
+<img src="public/slot-logo.png" alt="slot-logo" width="75" height="75"/>
 ## Overview
-Slot-VCS is a lightweight version control system designed for simplicity and efficiency. It allows users to track file changes, commit updates, and collaborate using remote repositories hosted on [CodeSlot](https://codeslot.in).
+Slot-VCS (referred to as Slot) is a lightweight version control system designed for simplicity and efficiency. It allows users to track file changes, commit updates, and collaborate using remote repositories hosted on [CodeSlot](https://codeslot.in).
+
+## Compatibility
+
+**Note:** Slot-VCS is compatible only with **Windows**, as it relies on **inode**, which is not fully supported on other operating systems. Additionally, Slot-VCS is built for **CommonJS (CJS) modules only.**
+
+Versions for other operating systems and support for modules other than CJS are **coming soon.**
 
 ## Installation
-To install Slot-VCS globally on your system, run:
+Slot-VCS must be installed **globally** on your system. To install, run
 
 ```sh
 npm install -g slot-vcs
