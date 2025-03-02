@@ -3,6 +3,8 @@
 
 Slot-VCS (referred to as Slot) is an NPM package that provides a version control system designed for simplicity and efficiency. It allows users to track file changes, commit updates, and collaborate using remote repositories hosted on [CodeSlot](https://codeslot.in).
 
+You can view your repository on [CodeSlot](https://codeslot.in)., see all the commits, and check how your repository looked before at any point in time.
+
 ## Compatibility
 
 **Note:** Slot-VCS is compatible only with **Windows**, as it relies on **inode**, which is not fully supported on other operating systems. 
@@ -43,7 +45,7 @@ slot add .
 ```
 Stages all modified and new files.
 
-<img src="public/addDemo.png" alt="slot-logo"/>
+<img src="public/addDemo.png" alt="add-img"/>
 
 ### Commit Changes
 ```sh
@@ -51,7 +53,7 @@ slot commit -m "Your commit message"
 ```
 Commits the staged files with a message.
 
-<img src="public/commitDemo.png" alt="slot-logo"/>
+<img src="public/commitDemo.png" alt="commit-img"/>
 
 ### Push Commits
 ```sh
@@ -59,7 +61,7 @@ slot push
 ```
 Pushes committed changes to the remote repository on CodeSlot.
 
-<img src="public/pushDemo.png" alt="slot-logo"/>
+<img src="public/pushDemo.png" alt="push-img"/>
 
 ### Pull Changes
 ```sh
@@ -67,7 +69,7 @@ slot pull
 ```
 Pulls the latest changes from the remote repository on CodeSlot.
 
-<img src="public/pullDemo.png" alt="slot-logo"/>
+<img src="public/pullDemo.png" alt="pull-img"/>
 
 ### Clone Repository
 ```sh
@@ -75,7 +77,7 @@ slot clone <url>
 ```
 Clones a repository from the specified URL.
 
-<img src="public/cloneDemo.png" alt="slot-logo"/>
+<img src="public/cloneDemo.png" alt="clone-img"/>
 
 ### View Commit History
 ```sh
@@ -117,6 +119,8 @@ To view the list of available commands, run:
 ```sh
 slot --help
 ```
+## View Your Repository on CodeSlot
+<img src="public/codeslotRepo.png" alt="codeslot-repo"/>
 
 ## License
 Slot-VCS is open-source and available under the MIT License.
