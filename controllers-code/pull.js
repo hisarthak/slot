@@ -475,7 +475,7 @@ await fs.writeFile(localFilePath, contentToWrite);
         const oldSnapshot = JSON.parse(commitDataFileContent);
         for (const key in oldSnapshot) {
             if (Object.prototype.hasOwnProperty.call(oldSnapshot, key)) {
-                oldSnapshot[key].change = false;
+                oldSnapshot[key].change = clone?true:false;
                 oldSnapshot[key].new = false;
                 oldSnapshot[key].pull = clone?false:true;
             }
