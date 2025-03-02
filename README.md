@@ -1,5 +1,6 @@
-# Slot-VCS - A Lightweight Version Control System
-<img src="public/slot-logo.png" alt="slot-logo" width="75" height="75"/>
+# Slot- Version Control System
+<img src="public/slot-logo.png" alt="slot-logo" width="95" height="95"/>
+
 ## Overview
 Slot-VCS (referred to as Slot) is a lightweight version control system designed for simplicity and efficiency. It allows users to track file changes, commit updates, and collaborate using remote repositories hosted on [CodeSlot](https://codeslot.in).
 
