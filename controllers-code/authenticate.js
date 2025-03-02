@@ -61,8 +61,7 @@ async function authenticateUser() {
                     const userConfig = {
                         token: token,
                         username: username,
-
-                        pushNumber: push
+                        pushNumber: pushNumber
                     };
 
                     
