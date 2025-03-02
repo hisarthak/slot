@@ -4,7 +4,7 @@ const yargs = require('yargs');
 const { hideBin } = require("yargs/helpers");
 
 const { initRepo } = require("./controllers-code/init.js");
-const { addFileToRepo, addModifiedOrLogs } = require("./controllers-code/addController");
+const { addFileToRepo, addAllToRepo } = require("./controllers-code/addController");
 const { commitRepo } = require("./controllers-code/commit.js");
 const { commitLogs } = require("./controllers-code/commitLogs.js");
 const { pushRepo } = require("./controllers-code/push");
@@ -20,7 +20,7 @@ yargs(hideBin(process.argv))
 .command("init", "Initialise a new repository", {}, initRepo)
   .command(
     "add <file>",
-    "Add a file or all modified/new files to the repository",
+    "Add a file or all modified/new files and folders to the repository",
     (yargs) => {
       yargs.positional("file", {
         describe: "File to add to the staging area. Use '.' to add all files.",
@@ -29,7 +29,7 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
       if (argv.file === ".") {
-        await addModifiedOrLogs(); 
+        await addAllToRepo(); 
       } else {
         await addFileToRepo(argv.file); // Add a specific file
       }
@@ -128,7 +128,7 @@ yargs(hideBin(process.argv))
         const commands = [
             ["slot init", "Initializes a new repository."],
             ["slot add <file>", "Adds a specific file to staging."],
-            ["slot add .", "Adds all modified/new logs to staging."],
+            ["slot add .", "Adds all modified/new files and folders to staging."],
             ["slot commit -m \"message\"", "Commits staged files (message required)."],
             ["slot push", "Pushes commits to the repository."],
             ["slot pull", "Pulls the latest changes from the repository."],

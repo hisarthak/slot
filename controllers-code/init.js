@@ -68,6 +68,15 @@ package-lock.json
   }
 }
 
+
+async function calculateFileHash(filePath) {
+  const fileBuffer = await fs.readFile(filePath); // Read the file content
+  const hash = crypto.createHash("sha256"); // Create a SHA-256 hash instance
+  hash.update(fileBuffer); // Update the hash with file content
+  return hash.digest("hex"); // Return the hash as a hexadecimal string
+}
+
+
 // Function to recursively capture file and folder snapshots in a given directory
 async function captureFilesSnapshot(dir, snapshot, repoRoot) {
   const entries = await fs.readdir(dir, { withFileTypes: true });
@@ -76,6 +85,7 @@ async function captureFilesSnapshot(dir, snapshot, repoRoot) {
   for (const entry of entries) {
     const entryPath = path.join(dir, entry.name);
     const relativePath = path.relative(repoRoot, entryPath);
+   
 
     // Skip files and folders listed in the slotignore.txt file
     const slotIgnoreContent = await fs.readFile(path.join(process.cwd(), "slotignore.txt"), "utf8");
@@ -103,18 +113,20 @@ async function captureFilesSnapshot(dir, snapshot, repoRoot) {
       // Recurse into the subdirectory
       await captureFilesSnapshot(entryPath, snapshot, repoRoot);
     } else if (entry.isFile()) {
-      const inode = await getFileInode(entryPath);  // Get inode (unique file ID)
+      const inode = await getFileInode(entryPath); 
+      const fileHash = await calculateFileHash(entryPath);  // Get inode (unique file ID)
       snapshot[relativePath] = {
         id: inode || "", // Store inode or empty string if unavailable
         text: entry.name,  // File name
-        droppable: true,      // Explicitly set type as file
+        droppable: true,  
+        hash: fileHash,     // Explicitly set type as file
         parent: "", 
         path: relativePath,         // Empty hash for now
         message: "",       // New field: empty string
         commit_id: "",     // New field: empty string
         change: true, 
         date : "",
-        pull : false
+        pull : false,
       };
     }
   }

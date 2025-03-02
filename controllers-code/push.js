@@ -7,6 +7,8 @@ const cliProgress = require("cli-progress");
 let theToken;
 let thePull;
 let ourRepoName;
+let thePushNumber
+let lastPushNumber;
 
 
 const axios = require("axios");
@@ -35,7 +37,7 @@ async function isLoggedIn() {
                    theLocalRepoId = userConfig.localRepoId;
                 //    console.log(theLocalRepoId);
            
-                //    console.log("✅ Token is valid.");
+                //    console.log("Token is valid.");
                    return true; // Token is valid
                } else {
                    console.error("Authentication Required");
@@ -98,14 +100,26 @@ Username: ${username} `
 }
 
 // Function to prompt user for username and password
-function promptLogin() {
+async function promptLogin() {
+    const configPath = path.join(process.cwd(), ".slot", "config.json");
+
+    // Load existing config if it exists
+    let existingConfig = {};
+    try {
+        const data = await fs.readFile(configPath, "utf8");
+        existingConfig = JSON.parse(data);
+    } catch (err) {
+        if (err.code !== "ENOENT") {
+            console.error("Error");
+        }
+    }
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
 
     return new Promise((resolve, reject) => {
-        rl.question("Enter your username: ", (username) => {
+        rl.question("Enter your Codeslot.in username: ", (username) => {
             rl.question("Enter your password: ", async (password) => {
                 try {
                     // Send login request to your backend
@@ -119,16 +133,18 @@ function promptLogin() {
                             headers: { "x-request-source": "cli" }, // Custom header to indicate CLI
                         }
                     );
-
-                    // Save token to .slot/config.json
                     const token = res.data.token;
-            
+                    // Use old pushNumber if the username matches
+                    const pushNumber = existingConfig.username === username 
+                        ? existingConfig.pushNumber 
+                        : 0;
 
                     const userConfig = {
-                        token: token,
-                        username: username,
-                        pushNumber: 0,   
+                        token,
+                        username,
+                        pushNumber,
                     };
+
 
                     // Save config file
                     await fs.writeFile(
@@ -242,7 +258,7 @@ let result;
                     return// Stop execution
                 }
                 else if (result.success=="error"){
-                    console.error("error");
+                    console.error("Error");
                     return;
                 }
             }

@@ -4,18 +4,40 @@ const readline = require("readline");
 const axios = require("axios");
 
 
+
 // Function to prompt user for username and password
-function authenticateUser() {
+async function authenticateUser() {
+    const chalk = await import("chalk"); 
+
+    const configPath = path.join(process.cwd(), ".slot", "config.json");
+     const repoPath = path.resolve(process.cwd(), ".slot");
+       const oldSnapshotPath = path.join(repoPath, "oldsnapshot.json");
+        try {
+            await fs.access(oldSnapshotPath);
+        } catch (error) {
+            console.log(chalk.default.red("Error: Repository not initialized. Run 'slot init' first."));
+            process.exit(1); // Exit the script
+        }
+
+    // Load existing config if it exists
+    let existingConfig = {};
+    try {
+        const data = await fs.readFile(configPath, "utf8");
+        existingConfig = JSON.parse(data);
+    } catch (err) {
+        if (err.code !== "ENOENT") {
+            console.error("Error");
+        }
+    }
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
-
     return new Promise((resolve, reject) => {
-        console.log("Authentication will be valid for 30 days.");
+        console.log(chalk.default.yellow("Authentication will be valid for 30 days."));
         
         
-        rl.question("Enter your username: ", (username) => {
+        rl.question("Enter your Codeslot.in username: ", (username) => {
             rl.question("Enter your password: ", async (password) => {
                 try {
                     // Send login request to your backend
@@ -29,6 +51,10 @@ function authenticateUser() {
                             headers: { "x-request-source": "cli" }, // Custom header to indicate CLI
                         }
                     );
+                       // Use old pushNumber if the username matches
+                       const pushNumber = existingConfig.username === username 
+                       ? existingConfig.pushNumber 
+                       : 0;
 
                     // Save token to .slot/config.json
                     const token = res.data.token;
@@ -36,7 +62,7 @@ function authenticateUser() {
                         token: token,
                         username: username,
 
-                        pushNumber: 0,
+                        pushNumber: push
                     };
 
                     

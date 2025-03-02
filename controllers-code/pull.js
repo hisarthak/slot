@@ -4,6 +4,7 @@ const axios = require("axios");
 const cliProgress = require("cli-progress"); // Import CLI progress bar
 const readline = require("readline");
 
+
 let theToken;
 let theUsername;
 let thePushNumber;
@@ -32,14 +33,14 @@ async function isLoggedIn() {
            
                    return true; // Token is valid
                } else {
-                   console.error("❌ Invalid token.");
+                   console.error("Invalid token.");
                    return false; // Token is invalid
                }
            
            
                           
                        }  catch (err) {
-                console.log(err);
+                console.log("Error");
                 return false; // Invalid token or token is expired
             }
         } else {
@@ -89,20 +90,33 @@ Username: ${username} `
             );
         }
     } catch (err) {
-        console.error(err.message);
+        console.error("Error");
         process.exit(1); // Exit with error
     }
 }
 
+
 // Function to prompt user for username and password
-function promptLogin() {
+async function promptLogin() {
+    const configPath = path.join(process.cwd(), ".slot", "config.json");
+
+    // Load existing config if it exists
+    let existingConfig = {};
+    try {
+        const data = await fs.readFile(configPath, "utf8");
+        existingConfig = JSON.parse(data);
+    } catch (err) {
+        if (err.code !== "ENOENT") {
+            console.error("Error");
+        }
+    }
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
 
     return new Promise((resolve, reject) => {
-        rl.question("Enter your username: ", (username) => {
+        rl.question("Enter your Codeslot.in username: ", (username) => {
             rl.question("Enter your password: ", async (password) => {
                 try {
                     // Send login request to your backend
@@ -116,22 +130,25 @@ function promptLogin() {
                             headers: { "x-request-source": "cli" }, // Custom header to indicate CLI
                         }
                     );
-
-                    // Save token to .slot/config.json
                     const token = res.data.token;
+                    // Use old pushNumber if the username matches
+                    const pushNumber = existingConfig.username === username 
+                        ? existingConfig.pushNumber 
+                        : 0;
+
                     const userConfig = {
-                        token: token,
-                        username: username,
-                        pushNumber: 0
-                        
+                        token,
+                        username,
+                        pushNumber,
                     };
+
 
                     // Save config file
                     await fs.writeFile(
                         path.join(process.cwd(), ".slot", "config.json"),
                         JSON.stringify(userConfig, null, 2)
                     );
-                   
+                    thePushNumber = userConfig.pushNumber;
                     resolve(token); // Return token after successful login
                 } catch (err) {
                     console.error(
@@ -146,18 +163,35 @@ function promptLogin() {
         });
     });
 }
+
+async function deleteFolderContents(folderPath) {
+    try {
+        await fs.access(folderPath); // Check if folder exists
+        const files = await fs.readdir(folderPath);
+        
+        for (const file of files) {
+            const filePath = path.join(folderPath, file);
+            const stat = await fs.stat(filePath);
+
+            if (stat.isDirectory()) {
+                await deleteFolderContents(filePath);
+                await fs.rmdir(filePath);
+            } else {
+                await fs.unlink(filePath);
+            }
+        }
+    } catch (err) {
+        if (err.code !== 'ENOENT') throw err; // Ignore folder not found errors
+    }
+}
+
+
 async function pullRepo(clone) {
     const chalk = await import("chalk");
     const repoPath = path.resolve(process.cwd(), ".slot");
     const remoteFilePath = path.join(repoPath, "remote.json");
     let logsDataResponse;
-    if(!clone){
-    try {
-        await fs.access(remoteFilePath);
-    } catch (error) {
-        console.error("Remote not set. Please set the remote repository using 'slot remote add <url>'.");
-        process.exit(1); // Exit the script
-    }}
+    const stagingPath = path.join(repoPath, 'staging');
     const logsPath = path.join(repoPath, "logs.json");
     const commitsPath = path.join(repoPath, "commits");
     const oldSnapshotPath = path.join(repoPath, "oldsnapshot.json");
@@ -167,6 +201,13 @@ async function pullRepo(clone) {
         console.log(chalk.default.red("Error: Repository not initialized. Run 'slot init' first."));
         process.exit(1); // Exit the script
     }
+    if(!clone){
+        try {
+            await fs.access(remoteFilePath);
+        } catch (error) {
+            console.error("Remote not set. Please set the remote repository using 'slot remote add <url>'.");
+            process.exit(1); // Exit the script
+        }}
     const configPath = path.join(repoPath, "config.json");
 
     const rootPath = process.cwd();
@@ -183,9 +224,12 @@ async function pullRepo(clone) {
         theToken = token;
            console.log("Authentication successful.");
        }
-     // console.log("📖 Reading remote.json...");
-     const remoteFileContent = await fs.readFile(remoteFilePath, "utf8");
-     const remoteData = JSON.parse(remoteFileContent);
+   let remoteFileContent;
+   let remoteData;
+     if(!clone){
+     remoteFileContent = await fs.readFile(remoteFilePath, "utf8");
+     remoteData = JSON.parse(remoteFileContent);
+     }
        let repoIdentifier;
         if(!clone){
         // console.log("🔗 Extracting repository identifier...");
@@ -231,17 +275,17 @@ async function pullRepo(clone) {
 
     
        }
-        // console.log("📖 Reading config.json...");
+        // console.log("Reading config.json...");
         const configContent = await fs.readFile(configPath, "utf8");
         const configData = JSON.parse(configContent);
          theToken = configData.token;
 
     
-        // console.log(`📌 Repository Identifier: ${repoIdentifier}`);
+        // console.log(`Repository Identifier: ${repoIdentifier}`);
 
         const s3LogsKey = `commits/${repoIdentifier}/logs.json`;
 
-        // console.log("🔗 Fetching logs.json URL...");
+        // console.log("Fetching logs.json URL...");
         const response = await axios.post("https://gitspace.duckdns.org:3002/repo/user/download/get-url", 
             { keyNames: [s3LogsKey], theToken, thePushNumber, ourRepoName, clone }, 
             { headers: { "Content-Type": "application/json" } }
@@ -250,14 +294,18 @@ async function pullRepo(clone) {
             console.log("Already up to date");
           return;
         }
+        if(!clone){
         console.log("Pulling");
+        }else{
+            console.log("Cloning repository")
+        }
         const { uploadUrls } = response.data;
         if (!uploadUrls || uploadUrls.length === 0) {
             throw new Error("No upload URL received from server.");
         }
-        // console.log("✅ Logs.json URL received.");
+        // console.log("Logs.json URL received.");
 
-        // console.log("📥 Downloading logs.json...");
+        // console.log("Downloading logs.json...");
         try {
              logsDataResponse = await axios.get(uploadUrls[0], {
                 headers: { "Content-Type": "application/octet-stream" },
@@ -277,21 +325,21 @@ async function pullRepo(clone) {
             }
         }
         const fileContent = JSON.stringify(logsDataResponse.data, null, 2);
-        // console.log("✅ Logs.json downloaded.");
+        // console.log("Logs.json downloaded.");
 
-        // console.log("💾 Writing logs.json to local file...");
+        // console.log("Writing logs.json to local file...");
         await fs.writeFile(logsPath, fileContent, "utf-8");
-        // console.log("✅ logs.json saved!");
+        // console.log("logs.json saved!");
 
-        // console.log("📖 Parsing logs.json...");
+        // console.log("Parsing logs.json...");
         const logs = JSON.parse(fileContent);
-        // console.log("🔍 Parsed logs:", logs);
+        // console.log(" Parsed logs:", logs);
 
         if (!Array.isArray(logs)) {
             throw new Error("logs.json does not contain an array of commits.");
         }
 
-        // console.log("🔍 Finding highest commit...");
+        // console.log("Finding highest commit...");
         const highestCommit = logs.reduce((max, commit) => commit.count > max.count ? commit : max, logs[0]);
         const commitID = highestCommit.commitID;
 
@@ -299,13 +347,13 @@ async function pullRepo(clone) {
             throw new Error("No commitID found in logs.json.");
         }
 
-        // console.log(`📌 Highest commit found: ${commitID}`);
+        // console.log(`Highest commit found: ${commitID}`);
 
         const commitDir = path.join(commitsPath, commitID);
-        // console.log(`📂 Creating directory: ${commitDir}`);
+        // console.log(`Creating directory: ${commitDir}`);
         await fs.mkdir(commitDir, { recursive: true });
 
-        // console.log("🔗 Fetching commitData.json URL...");
+        // console.log("Fetching commitData.json URL...");
         const commitDataKey = `commits/${repoIdentifier}/${commitID}/commitData.json`;
         const commitDataResponse = await axios.post("https://gitspace.duckdns.org:3002/repo/user/download/get-url", 
             { keyNames: [commitDataKey], theToken, thePushNumber, ourRepoName, clone }, 
@@ -316,24 +364,24 @@ async function pullRepo(clone) {
         if (!commitDataUrls || commitDataUrls.length === 0) {
             throw new Error("No URL received for commitData.json.");
         }
-        // console.log("✅ commitData.json URL received.");
+        // console.log("commitData.json URL received.");
 
-        // console.log("📥 Downloading commitData.json...");
+        // console.log(" Downloading commitData.json...");
         const commitDataFile = await axios.get(commitDataUrls[0], 
             { headers: { "Content-Type": "application/octet-stream" }, timeout: 30000 }
         );
 
         const commitDataPath = path.join(commitDir, "commitData.json");
         const commitDataFileContent = JSON.stringify(commitDataFile.data, null, 2);
-        // console.log("✅ commitData.json downloaded.");
+        // console.log("commitData.json downloaded.");
 
-        // console.log("💾 Writing commitData.json to local file...");
+        // console.log("Writing commitData.json to local file...");
         await fs.writeFile(commitDataPath, commitDataFileContent);
-        // console.log("✅ commitData.json saved!");
+        // console.log("commitData.json saved!");
 
-        // console.log("📖 Parsing commitData.json...");
+        // console.log("Parsing commitData.json...");
         const commitData = JSON.parse(commitDataFileContent);
-        // console.log("🔍 Parsed commitData:", commitData);
+        // console.log("Parsed commitData:", commitData);
 
         const fileKeys = [
             ...Object.values(commitData)
@@ -341,7 +389,7 @@ async function pullRepo(clone) {
                 .map(file => `commits/${repoIdentifier}/${commitID}/${file.path.replace(/\\/g, "/")}`),
            `commits/${repoIdentifier}/${commitID}/commit.json`
         ];
-        // console.log("🗂️ File keys to download:", fileKeys);
+        // console.log("File keys to download:", fileKeys);
 
 
         // console.log("🔗 Fetching URLs for commit files...");
@@ -352,12 +400,12 @@ async function pullRepo(clone) {
 
         const { uploadUrls: fileUrls, pushNumber } = urlResponse.data;
         let savedPushNumber = pushNumber; 
-        // console.log("✅ File URLs received:", fileUrls);
+        // console.log("File URLs received:", fileUrls);
 
         if (!fileUrls || fileUrls.length === 0) {
             throw new Error("No URLs received for commit files.");
         }
- // 🟢 Initialize progress bar
+ // Initialize progress bar
  const progressBar = new cliProgress.SingleBar(
     {
         format: " {bar} {percentage}% | {value}/{total} files",
@@ -415,26 +463,32 @@ await fs.writeFile(localFilePath, contentToWrite);
            }else{
             await fs.writeFile(rootFilePath, contentToWrite);}
             
-            // 🔵 Update progress bar
+            // Update progress bar
             progressBar.update(i + 1);
             // console.log("4");
         }
         progressBar.stop();
 
-        // console.log("✅ All commit files downloaded and saved!");
+        // console.log("All commit files downloaded and saved!");
 
-        // console.log("📖 Updating oldsnapshot.json...");
+        // console.log("Updating oldsnapshot.json...");
         const oldSnapshot = JSON.parse(commitDataFileContent);
         for (const key in oldSnapshot) {
             if (Object.prototype.hasOwnProperty.call(oldSnapshot, key)) {
-                oldSnapshot[key].change = clone?true:false;
+                oldSnapshot[key].change = false;
                 oldSnapshot[key].new = false;
                 oldSnapshot[key].pull = clone?false:true;
             }
         }
         await fs.writeFile(oldSnapshotPath, JSON.stringify(oldSnapshot, null, 2));
-        // console.log("✅ oldsnapshot.json updated!");
-
+        // console.log("oldsnapshot.json updated!");
+        if (clone) {
+            deleteFolderContents(stagingPath);
+        }
+        if (clone && (await fs.stat(logsPath).catch(() => false))) {
+            await fs.unlink(logsPath);
+        }
+    
        
            
             configData.pushNumber = savedPushNumber;

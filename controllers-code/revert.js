@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const { promisify } = require("util");
 
+
 const readdir = promisify(fs.readdir);
 const copyFile = promisify(fs.copyFile);
 const unlink = promisify(fs.unlink);
@@ -10,8 +11,11 @@ const stat = promisify(fs.stat);
 const mkdir = promisify(fs.mkdir);
 
 async function revertRepo(commitID) {
+    const chalk = await import("chalk"); // Dynamically import chalks
     const repoPath = path.resolve(process.cwd(), ".slot");
     const commitsPath = path.join(repoPath, "commits");
+   
+    
 
     // console.log("Repo Path:", repoPath);
     // console.log("Commits Path:", commitsPath);
@@ -71,7 +75,8 @@ async function revertRepo(commitID) {
 
         console.log(`Commit ${commitID} reverted successfully`);
     } catch (err) {
-        console.error("Unable to revert");
+        console.error(`Unable to revert. The commit '${commitID}' does not exist locally. ` +
+        "Maybe you have pulled or cloned the repo, so there is no commit data stored locally.");
     }
 }
 

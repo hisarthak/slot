@@ -5,6 +5,14 @@ let commitCount2;
 let num = 1;
 
 async function commitRepo(message) {
+  const repoPath = path.resolve(process.cwd(), ".slot");
+     const oldSnapshotPath = path.join(repoPath, "oldsnapshot.json");
+      try {
+          await fs.access(oldSnapshotPath);
+      } catch (error) {
+          console.error("Error: Repository not initialized. Run 'slot init' first.");
+          process.exit(1); // Exit the script
+      }
   // Validate the commit message
   if (!message || typeof message !== "string") {
     console.error("Error: Commit message cannot be blank.");
@@ -18,11 +26,12 @@ async function commitRepo(message) {
     return;
   }
 
-  const repoPath = path.resolve(process.cwd(), ".slot");
+ 
   const stagedPath = path.join(repoPath, "staging");
   const commitPath = path.join(repoPath, "commits");
   const commitLogPath = path.join(repoPath, "logs.json"); // Explicit .json extension
-  const oldSnapshotPath = path.join(repoPath, "oldSnapshot.json");
+  
+  
 
   try {
     // Check if there are any changes to commit

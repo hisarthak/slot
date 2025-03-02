@@ -4,6 +4,14 @@ const path = require("path");
 async function commitLogs() {
   const chalk = await import("chalk"); // Dynamically import chalk
   const repoPath = path.resolve(process.cwd(), ".slot", "logs.json");
+  const slotFolderPath = path.resolve(process.cwd(), ".slot");
+     const oldSnapshotPath = path.join(slotFolderPath, "oldsnapshot.json");
+      try {
+          await fs.access(oldSnapshotPath);
+      } catch (error) {
+          console.log(chalk.default.red("Error: Repository not initialized. Run 'slot init' first."));
+          process.exit(1); // Exit the script
+      }
 
   try {
     const data = await fs.readFile(repoPath, "utf-8");

@@ -40,7 +40,7 @@ async function handleDeletedFiles(snapshot, stagingDir, slotIgnoreFile) {
       const existsInStaging = stagingFiles.includes(relativePath) || await fs.stat(filePathInStaging).catch(() => false);
       const existsInBackend = await fs.stat(filePathInBackend).catch(() => false);
 
-      if (!existsInStaging || !existsInBackend) {
+      if (!existsInBackend) {
         try {
           await fs.rm(filePathInStaging, { recursive: true, force: true });
           
@@ -199,7 +199,7 @@ targetName = targetName.split('/').pop();
 
 if (targetPath === "x17bcc3a699f-*#@%^&()+ask") {
   console.error(`
-    Multiple files or directories named "${targetName}" were found.
+    Multiple files or directories named "${targetName}" were found with modifications or as newly created.
     Please use the relative path and add "/relative/" in front,
     e.g., slot add /relative/folder1/${targetName}.
     `
@@ -358,7 +358,7 @@ await fs.mkdir(stagingFileDir, { recursive: true });
 }
 
 
-async function addModifiedOrLogs() {
+async function addAllToRepo() {
   const chalk = await import("chalk");
   const slotIgnoreFile = path.join(process.cwd(), "slotignore.txt");
   const repoPath = path.resolve(process.cwd(), ".slot");
@@ -375,7 +375,7 @@ async function addModifiedOrLogs() {
     await dir.close(); 
     let firstAdd;
     if(firstEntry===null){
-firstAdd=true;
+firstAdd=false;
     }
 
   try {
@@ -632,4 +632,4 @@ async function calculateFileHash(filePath) {
 }
 
 
-module.exports = { addFileToRepo, addModifiedOrLogs };
+module.exports = { addFileToRepo, addAllToRepo };
