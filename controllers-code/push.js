@@ -43,8 +43,7 @@ async function isLoggedIn() {
                    console.error("Authentication Required");
                    return false; // Token is invalid
                }
-           
-           
+            
                           
                        }  catch (err) {
                 console.log("Error", err);

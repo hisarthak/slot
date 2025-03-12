@@ -4,7 +4,6 @@ const axios = require("axios");
 const cliProgress = require("cli-progress"); // Import CLI progress bar
 const readline = require("readline");
 
-
 let theToken;
 let theUsername;
 let thePushNumber;

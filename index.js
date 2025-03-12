@@ -13,7 +13,6 @@ const { revertRepo } = require("./controllers-code/revert");
 const {addRemote, removeRemote, listRemote} = require("./controllers-code/remote.js");
 const {authenticateUser} = require("./controllers-code/authenticate.js");
 
-
 yargs(hideBin(process.argv))
 .scriptName("slot")
 .command("init", "Initialise a new repository", {}, initRepo)
