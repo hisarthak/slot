@@ -14,6 +14,7 @@ const {addRemote, removeRemote, listRemote} = require("./controllers-code/remote
 const {authenticateUser} = require("./controllers-code/authenticate.js");
 
 
+
 yargs(hideBin(process.argv))
 .scriptName("slot")
 .command("init", "Initialise a new repository", {}, initRepo)

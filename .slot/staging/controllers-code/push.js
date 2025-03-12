@@ -47,7 +47,7 @@ async function isLoggedIn() {
            
                           
                        }  catch (err) {
-                console.log("Error", err);
+                console.log("Error");
                 return false; // Invalid token or token is expired
             }
         } else {
@@ -94,7 +94,7 @@ Username: ${username} `
             );
         }
     } catch (err) {
-        console.error("Error", err);
+        console.error("Error");
         process.exit(1); // Exit with error
     }
 }
@@ -110,7 +110,7 @@ async function promptLogin() {
         existingConfig = JSON.parse(data);
     } catch (err) {
         if (err.code !== "ENOENT") {
-            console.error("Error", err);
+            console.error("Error");
         }
     }
     const rl = readline.createInterface({
@@ -258,7 +258,7 @@ let result;
                     return// Stop execution
                 }
                 else if (result.success=="error"){
-                    console.error("Error", err);
+                    console.error("Error");
                     return;
                 }
             }
@@ -305,7 +305,7 @@ let result;
 
         console.log(chalk.default.green("Pushed successfully"));
     } catch (err) {
-        console.error("Error during pushing commits", err);
+        console.error("Error during pushing commits");
     }
 }
 

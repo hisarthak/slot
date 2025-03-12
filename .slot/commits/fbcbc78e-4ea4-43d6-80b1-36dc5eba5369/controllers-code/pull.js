@@ -214,6 +214,7 @@ async function pullRepo(clone) {
 
     try {
       
+       
        const loggedIn = await isLoggedIn();
        
        if (!loggedIn) {

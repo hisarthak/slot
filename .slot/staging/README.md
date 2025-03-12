@@ -3,9 +3,7 @@
 
 Slot-VCS (referred to as Slot) is an NPM package that provides a version control system designed for simplicity and efficiency. It allows users to track file changes, commit updates, and collaborate using remote repositories hosted on [CodeSlot](https://codeslot.in).
 
-All repository data is securely stored in an **AWS S3 bucket**, ensuring reliability and scalability.
-
-You can view your repository on [CodeSlot](https://codeslot.in), see all the commits, and check how your repository looked before at any point in time.
+You can view your repository on [CodeSlot](https://codeslot.in)., see all the commits, and check how your repository looked before at any point in time.
 
 ## Compatibility
 
